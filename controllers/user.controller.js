@@ -1,6 +1,7 @@
-// import chatBotModel from '../models/chat-bot.model.js'
+
 import userModel from '../models/user.model.js'
 import { hashPassword, generateToken } from '../utility/utility.js'
+import chatBotModel from '../models/chat-bot.model.js'
 
 export const createUser = async (req, res) => {
   try {
@@ -59,7 +60,7 @@ export const getUser = async (req, res) => {
     let id = req.params.id
     const user = await userModel.findOne({
       where: { id },
-      // include:chatBotModel
+      include:chatBotModel
     })
     if (!user) {
       return res.status(404).json({

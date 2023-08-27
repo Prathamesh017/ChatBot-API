@@ -6,6 +6,10 @@ import {
   updateUser,
   deleteUser,
 } from '../controllers/user.controller.js'
+import {
+  createChatBot,
+  getAllChatBotOfUser,
+} from '../controllers/chat-bot.controller.js'
 
 import verifyToken from '../middleware/middleware.js'
 const usersRouter = Router()
@@ -16,10 +20,7 @@ usersRouter
   .post('/', createUser)
   .put('/:id', verifyToken, updateUser)
   .delete('/:id', verifyToken, deleteUser)
-  // .post('/:userId/chatbots', verifyToken, createChatBot)
-  // .get('/:userId/chatbots', verifyToken, getChatBot)
-  // .get('/:userId/chatbots', verifyToken, getChatBot)
-
-
+  .post('/:userId/chatbots', verifyToken, createChatBot)
+  .get('/:userId/chatbots', verifyToken, getAllChatBotOfUser)
 
 export default usersRouter
