@@ -1,22 +1,23 @@
-import chatBotModel from '../models/chat-bot.model.js'
-import chatModel from '../models/chats.model.js'
-// import userModel from '../models/user.model.js'
-export const createChatBot = async (req, res) => {
-  try {
-    let { name, description } = req.body
+import chatModel from '../models/chats.model.js';
+import chatsModel from '../models/chats.model.js'
 
-    let id = req.params.userId
-    if (!(name, description)) {
+export const createChats = async (req, res) => {
+  try {
+    let { message,complete} = req.body
+
+    console.log(req.body);
+    let id = req.params.chatbotId
+    if (!(message)) {
       return res.status(400).json({
         status: 'Failure',
-        message: 'Incomplete Data. Need name and description',
+        message: 'Incomplete Data.Need message and complete',
       })
     }
 
     if (!id) {
       return res.status(400).json({
         status: 'failure',
-        message: 'id missing',
+        message: 'chatbotId missing',
       })
     }
 
@@ -27,16 +28,18 @@ export const createChatBot = async (req, res) => {
       })
     }
 
-    let chatBot = await chatBotModel.create({
-      name,
-      description,
-      userId: id,
+    console.log(req.user)
+    let chatsMessage = await chatsModel.create({
+      message,
+      complete,
+      chatBotId: id,
+      endUserId: req.user.id,
     })
-    if (chatBot) {
+    if (chatsMessage) {
       return res.status(201).json({
         status: 'success',
-        data: chatBot,
-        message: 'Chat Bot Created Successfully',
+        data: chatsMessage,
+        message: 'Chat Message Created Successfully',
       })
     }
   } catch (err) {
@@ -47,14 +50,15 @@ export const createChatBot = async (req, res) => {
   }
 }
 
-export const getAllChatBotOfUser = async (req, res) => {
+
+export const getAllChatsOfAChatBot = async (req, res) => {
   try {
-    const id = req.params.userId
-    const chatBots = await chatBotModel.findAll({ where: { userId: id } })
-    if (chatBots) {
+    const id = req.params.conversationId
+    const chats = await chatsModel.findAll({ where: { chatBotId: id } })
+    if (chats) {
       res.status(200).json({
         status: 'success',
-        data: chatBots,
+        data: chats,
         message: 'ALL Chats Retrieved',
       })
     }
@@ -65,23 +69,25 @@ export const getAllChatBotOfUser = async (req, res) => {
     })
   }
 }
-export const getChatBot = async (req, res) => {
+
+export const getChat = async (req, res) => {
   try {
-    let id = req.params.chatBotId
-    const chatBot = await chatBotModel.findOne({
-      where: { id, userId: req.user.id },
-      include: chatModel,
+    let id = req.params.conversationId
+  
+    const chats = await chatsModel.findOne({
+      where: { id,endUserId: req.user.id },
+
     })
-    if (!chatBot) {
+    if (!chats) {
       return res.status(404).json({
         status: 'failure',
-        message: 'ChatBot not Found',
+        message: 'Chats not Found',
       })
     }
     return res.status(200).json({
       status: 'success',
-      data: chatBot,
-      message: 'Chat bot retrieved',
+      data: chats,
+      message: 'Chats retrieved',
     })
   } catch (err) {
     return res.status(400).json({
@@ -91,28 +97,28 @@ export const getChatBot = async (req, res) => {
   }
 }
 
-export const updateChatBot = async (req, res) => {
+export const updateChat = async (req, res) => {
   try {
-    let id = req.params.chatBotId
-    let { name, description } = req.body
+    let id = req.params.conversationId
+    let { message,complete } = req.body
     if (!id) {
       return res.status(400).json({
         status: 'failure',
         message: 'id missing',
       })
     }
-    const chatBotExists = await chatBotModel.findOne({
-      where: { id, userId: req.user.id },
+    const chatExists = await chatModel.findOne({
+      where: { id, endUserId: req.user.id },
     })
-    if (!chatBotExists) {
+    if (!chatExists) {
       return res.status(404).json({
         status: 'failure',
-        message: 'Chatbot Doesnt exist',
+        message: 'Conversion Doesnt exist',
       })
     }
 
-    await chatBotModel.update(
-      { name, description },
+    await chatModel.update(
+      { message, complete },
       {
         where: {
           id,
@@ -122,7 +128,7 @@ export const updateChatBot = async (req, res) => {
 
     res.status(201).json({
       status: 'success',
-      message: 'ChatBot Update Successfully',
+      message: 'Chat Update Successfully',
     })
   } catch (err) {
     return res.status(400).json({
@@ -131,26 +137,26 @@ export const updateChatBot = async (req, res) => {
     })
   }
 }
-export const deleteChatBot = async (req, res) => {
+export const deleteChat = async (req, res) => {
   try {
-    let id = req.params.chatBotId
+    let id = req.params.conversationId
     if (!id) {
       return res.status(400).json({
         status: 'failure',
         message: 'id missing',
       })
     }
-    const chatBotExists = await chatBotModel.findOne({
-      where: { id, userId: req.user.id },
+    const chatsExists = await chatModel.findOne({
+      where: { id, endUserId: req.user.id },
     })
-    if (!chatBotExists) {
+    if (!chatsExists) {
       return res.status(400).json({
         status: 'failure',
-        message: 'ChatBot Doesnt Exist',
+        message: 'Chats Doesnt Exist',
       })
     }
 
-    await chatBotModel.destroy({
+    await chatsModel.destroy({
       where: {
         id,
       },
@@ -158,7 +164,7 @@ export const deleteChatBot = async (req, res) => {
 
     res.status(204).json({
       status: 'success',
-      message: 'Chat Bot Deleted Successfully',
+      message: 'Chats Deleted Successfully',
     })
   } catch (err) {
     return res.status(400).json({

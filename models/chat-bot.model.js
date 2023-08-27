@@ -19,6 +19,8 @@ const chatBotModel = sequelize.define(
 
 chatBotModel.belongsTo(userModel, { foreignKey: 'userId' })
 userModel.hasMany(chatBotModel)
+
+
 await chatBotModel.sync()
 
 export default chatBotModel

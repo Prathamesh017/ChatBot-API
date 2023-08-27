@@ -1,4 +1,4 @@
-// import chatBotModel from '../models/chat-bot.model.js'
+import chatModel from '../models/chats.model.js'
 import endUserModel from '../models/end-user.model.js'
 import { generateToken } from '../utility/utility.js'
 
@@ -56,7 +56,7 @@ export const getEndUser = async (req, res) => {
     let id = req.params.endUserId
     const user = await endUserModel.findOne({
       where: { id },
-      // include:chatBotModel
+      include:chatModel
     })
     if (!user) {
       return res.status(404).json({

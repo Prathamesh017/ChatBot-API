@@ -4,6 +4,7 @@ import bodyParser from 'body-parser'
 import usersRouter from './routes/user.route.js'
 import endUserRouter from './routes/end-user.route.js'
 import chatBotRouter from './routes/chat-bot.route.js'
+import chatRouter from './routes/chats.route.js'
 // import endUserRouter from './routes/end-user.router.js'
 
 const app = express()
@@ -20,6 +21,7 @@ app.get('/', (req, res) => {
 app.use('/api/users', usersRouter)
 app.use('/api/chatbots', chatBotRouter)
 app.use('/api/endusers', endUserRouter)
+app.use("/api/conversations",chatRouter)
 app.listen(port, () => {
   console.log('Server is Running on Port', port)
 })
