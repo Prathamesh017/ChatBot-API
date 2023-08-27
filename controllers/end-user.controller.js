@@ -1,22 +1,20 @@
 // import chatBotModel from '../models/chat-bot.model.js'
-import userModel from '../models/user.model.js'
-import { hashPassword, generateToken } from '../utility/utility.js'
+import endUserModel from '../models/end-user.model.js'
+import { generateToken } from '../utility/utility.js'
 
-export const createUser = async (req, res) => {
+export const createEndUser = async (req, res) => {
   try {
-    let { name, email, password } = req.body
-    if (!(name && email && password)) {
+    let { name, email } = req.body
+    if (!(name && email)) {
       res.status(400).json({
         status: 'Failure',
         message: 'Incomplete Data',
       })
     }
-    let hashedPassword = await hashPassword(password)
 
-    let user = await userModel.create({
+    let user = await endUserModel.create({
       name,
       email,
-      password: hashedPassword,
     })
 
     if (user) {
@@ -25,7 +23,7 @@ export const createUser = async (req, res) => {
         status: 'success',
         data: user,
         token,
-        message: 'User Created Successfully',
+        message: 'END User Created Successfully',
       })
     }
   } catch (err) {
@@ -36,14 +34,14 @@ export const createUser = async (req, res) => {
   }
 }
 
-export const getAllUsers = async (req, res) => {
+export const getAllEndUsers = async (req, res) => {
   try {
-    const users = await userModel.findAll({})
+    const users = await endUserModel.findAll({})
     if (users) {
       res.status(200).json({
         status: 'success',
         data: users,
-        message: 'ALL Users Retrieved',
+        message: 'ALL END Users Retrieved',
       })
     }
   } catch (err) {
@@ -53,11 +51,10 @@ export const getAllUsers = async (req, res) => {
     })
   }
 }
-export const getUser = async (req, res) => {
+export const getEndUser = async (req, res) => {
   try {
-    
-    let id = req.params.id
-    const user = await userModel.findOne({
+    let id = req.params.endUserId
+    const user = await endUserModel.findOne({
       where: { id },
       // include:chatBotModel
     })
@@ -71,7 +68,7 @@ export const getUser = async (req, res) => {
     res.status(200).json({
       status: 'success',
       data: user,
-      message: 'Users Retrieved',
+      message: 'End Users Retrieved',
     })
   } catch (err) {
     return res.status(400).json({
@@ -80,9 +77,9 @@ export const getUser = async (req, res) => {
     })
   }
 }
-export const updateUser = async (req, res) => {
+export const updateEndUser = async (req, res) => {
   try {
-    let id = req.params.id
+    let id = req.params.endUserId
     let { name, email } = req.body
     if (!id) {
       return res.status(400).json({
@@ -90,21 +87,21 @@ export const updateUser = async (req, res) => {
         message: 'id missing',
       })
     }
-    const userExists = await userModel.findOne({ where: { id } })
+    const userExists = await endUserModel.findOne({ where: { id } })
     if (!userExists) {
       return res.status(400).json({
         status: 'failure',
         message: 'No User Exists with this ID',
       })
     }
-    if (req.user.id!==userExists.id) {
+    if (req.user.id !== userExists.id) {
       return res.status(403).json({
         status: 'failure',
         message: 'Not Authorized',
       })
     }
-    
-    await userModel.update(
+
+    await endUserModel.update(
       { name, email },
       {
         where: {
@@ -115,7 +112,7 @@ export const updateUser = async (req, res) => {
 
     res.status(201).json({
       status: 'success',
-      message: 'User Updated Successfully',
+      message: 'END User Updated Successfully',
     })
   } catch (err) {
     return res.status(400).json({
@@ -124,31 +121,31 @@ export const updateUser = async (req, res) => {
     })
   }
 }
-export const deleteUser = async (req, res) => {
+export const deleteEndUser = async (req, res) => {
   try {
-    let id = req.params.id
+    let id = req.params.endUserId
     if (!id) {
       return res.status(400).json({
         status: 'failure',
         message: 'id missing',
       })
     }
-    const userExists = await userModel.findOne({ where: { id } })
+    const userExists = await endUserModel.findOne({ where: { id } })
     if (!userExists) {
       return res.status(400).json({
         status: 'failure',
         message: 'No User Exists with this ID',
       })
     }
-    
-    if (req.user.id!==userExists.id) {
+
+    if (req.user.id !== userExists.id) {
       return res.status(403).json({
         status: 'failure',
         message: 'Not Authorized',
       })
     }
 
-    await userModel.destroy({
+    await endUserModel.destroy({
       where: {
         id,
       },
@@ -156,7 +153,7 @@ export const deleteUser = async (req, res) => {
 
     res.status(204).json({
       status: 'success',
-      message: 'User Deleted Successfully',
+      message: 'End User Deleted Successfully',
     })
   } catch (err) {
     return res.status(400).json({
