@@ -5,7 +5,6 @@ export const createChats = async (req, res) => {
   try {
     let { message,complete} = req.body
 
-    console.log(req.body);
     let id = req.params.chatbotId
     if (!(message)) {
       return res.status(400).json({
@@ -28,7 +27,6 @@ export const createChats = async (req, res) => {
       })
     }
 
-    console.log(req.user)
     let chatsMessage = await chatsModel.create({
       message,
       complete,
@@ -53,7 +51,7 @@ export const createChats = async (req, res) => {
 
 export const getAllChatsOfAChatBot = async (req, res) => {
   try {
-    const id = req.params.conversationId
+    const id = req.params.chatbotId
     const chats = await chatsModel.findAll({ where: { chatBotId: id } })
     if (chats) {
       res.status(200).json({
@@ -73,6 +71,7 @@ export const getAllChatsOfAChatBot = async (req, res) => {
 export const getChat = async (req, res) => {
   try {
     let id = req.params.conversationId
+
   
     const chats = await chatsModel.findOne({
       where: { id,endUserId: req.user.id },
